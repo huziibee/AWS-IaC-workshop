@@ -1,0 +1,10 @@
+[
+  {
+      "ParameterKey": "BucketName",
+      "ParameterValue": "wits-moe-86453245"
+  },
+  {
+      "ParameterKey": "Environment",
+      "ParameterValue": "development"
+  }
+]

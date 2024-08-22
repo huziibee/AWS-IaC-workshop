@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: "wits-moe-bee-64532"
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+            VersioningConfiguration:       
+                Status: Enabled       

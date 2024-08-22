@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Basic CloudFormation template to demonstrate conditions.
+
+Parameters:
+  EnvironmentType:
+    Description: The environment where the stack is deployed (prod or preprod)
+    Type: String
+    AllowedValues:
+      - prod
+      - preprod
+    Default: preprod
+
+Conditions:
+  IsProduction:
+    Fn::Equals:
+      - !Ref EnvironmentType
+      - prod
+  IsPreProd:
+    Fn::Equals:
+      - !Ref EnvironmentType
+      - preprod
+
+Resources:
+  ProdBucket:
+    Type: AWS::S3::Bucket
+    Condition: IsProduction
+    Properties:
+      BucketName: !Sub "${AWS::Region}-${AWS::AccountId}-bucket-prod"
+      VersioningConfiguration: 
+        Status: Enabled
+
+  PreProdBucket:
+    Type: AWS::S3::Bucket
+    Condition: IsPreProd
+    Properties:
+      BucketName: !Sub "${AWS::Region}-${AWS::AccountId}-bucket-preprod"
+      VersioningConfiguration:
+        Status: Suspended
+

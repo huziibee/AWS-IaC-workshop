@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  BucketName:
+      Type: String
+      Description: The name of the S3 bucket
+      Default: our-first-s3-bucket-workshop
+      AllowedPattern: '^[a-zA-Z0-9.\-_]{1,255}$'
+      ConstraintDescription: must be a valid S3 bucket name.
+  Environment:
+      Type: String
+      Description: The environment where we want to deploy the stack
+      AllowedValues:
+       - development
+       - production
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: !Sub "${BucketName}-${Environment}"
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+            VersioningConfiguration:
+                Status: Enabled
+    

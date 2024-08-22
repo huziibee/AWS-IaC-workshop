@@ -1,0 +1,615 @@
+Infrastructure as Code: AWS CloudFormation and AWS Cloud Development Kit Workshop
+In this lab, you will learn how to create system resources in the cloud using AWS CloudFormation and the AWS Cloud Development Kit (CDK). These two approaches to working with resources is known as Infrastructure as Code (IaC). The first part of the lab will focus on CloudFormation and how it is used to create AWS resources like S3 buckets. The second part of the workshop will focus on CDK, and how you can use a programming language like Python to interact with AWS.
+
+This lab is subdivided into workflows with each building upon the previous workflow covered, and should be completed in order.
+
+Expected completion time for this lab is 60 minutes.
+
+Introduction & Setup
+Welcome to our AWS workshop on CloudFormation and Cloud Development Kit (CDK)! In this session, we will dive into the practical aspects of deploying and managing AWS resources using CloudFormation, CDK and Infrastructure as Code (IaC). This workshop is designed for university students who already have a foundational understanding of cloud concepts and are ready to apply their knowledge in a hands-on environment.
+
+Learning Objectives
+Upon successful completion of this lab, you will be able to:
+
+Create and manage AWS resources using CloudFormation stacks.
+Customize CloudFormation stacks with parameters.
+Utilize conditions in CloudFormation.
+Deploy a resource using the Cloud Development Kit
+Warning: Code Inside
+This lab contains workflows that requires you to be able to read and understand code. The code is short and supplied to you, but could be challenging for anyone that is new to coding. This is not a lab to learn how to code for the first time. Most of the code used throughout the lab is written in YAML with the last workflow using Python. YAML stands for Yet Another Markup Language, and is comprised of human-readable programming constructs commonly used for configuration files.
+AWS Accounts
+In this lab, you will be connecting to the AWS cloud which requires use of an AWS Account.
+
+Hosted Lab Event
+The lab instructions assume you are taking part in a hosted lab event, and the instructors will supply an AWS account for you to use throughout the event. If you are taking part of a hosted event, you can skip the remainder of this section.
+Using Your Own AWS Account
+If you are attempting this workshop independently, you will need to source your own AWS account to complete all the steps. If you don't already have an account, you can create one: How do I create and activate a new AWS account? 
+
+Important if using your own account
+Cloud resources utilize a 'pay for what you use' model, so delete or switch off what you're not using. The lab steps will provision AWS services, and instruct you to store several files which incur a cost. While provisioning and briefly using the S3 buckets as a learning exercise should only incur a relatively low cost, care should be taken to delete resources when no longer needed to ensure future charges do not accrue. While the S3 bucket is only used for an hour, provisioned AWS resources cost money and you should check the pricing in your currency before attempting to create other resources. Deleting unused services and resources will help reduce costs. Instructions on how to delete all of the resources used in this lab are included at the end of this lab Summary and Clean-up.
+
+Setup: Visual Studio Code Server
+This lab is offered as an AWS-hosted lab meaning AWS personnel will supply a temporary AWS account for running the IDE and the other required components. You supply the computer with a web browser, and the ability to connect to the internet. You also have the option of running the lab using your own AWS account. If running the lab on your own system, it is recommended that you install and run the Visual Studio Code  IDE locally to complete the workflows.
+
+To get started with the lab as quickly as possible, we will be using Visual Studio Code Server  (VS Code Server) running on an Amazon EC2 Instance inside the AWS account. This means you do not need to install anything on your local computer, such as VS Code, NodeJS, or other software utilities.
+
+Accessing Visual Studio Code Server
+Open the Workshop Studio event dashboard .
+Navigate to the Event Outputs pane at the bottom of the page.
+Copy the Password string. You will need this password in the next step.
+Select the URL to open Visual Studio Code Server.
+Code-server Password and URL
+
+In the Welcome to code-server dialog, paste the password that you copied earlier, and click Submit.
+Submit
+
+You should now see the Visual Studio Code IDE, as shown below.
+
+Visual Studio Code Server
+
+Visual Studio Code Server installed components
+The following items have already been installed on your VS Code Server instance, so you don't need to install them locally or on the EC2 instance.
+
+Node .
+Python .
+VSCode also includes a terminal utility that will be used throughout the lab workflows. To enable the terminal, from the upper-left corner of the VSCode interface:
+
+Click "File" > "Terminal" > "New Terminal"
+open terminal
+
+This will open up a terminal session at the bottom of VSCode. Whenever the lab instructs you to enter commands from the terminal, you can enter them at the available prompt.
+
+terminal window
+
+Conclusion of workflow
+What did you do in this workflow?
+In this introductory workstream, we successfully connected to the VSCode server created on an EC2 instance. This will enable us to leverage an integrated development environment (or IDE) for creating files, and using a terminal interface for executing commands.
+
+   
+Create your first Resource
+
+Create your first Resource
+Congratulations! You’ve recently joined a company that uses AWS CloudFormation extensively to manage its infrastructure.
+
+As part of your onboarding process, you will be diving into hands-on activities that will familiarize you with the team's workflows involving CloudFormation and the AWS Cloud Development Kit (CDK). This session is designed to equip you with practical skills in defining and deploying AWS resources using these powerful tools.
+
+Provisioning a Virtual Machine in the Cloud
+CloudFormation
+AWS CloudFormation is a managed service that allows you to define and provision AWS infrastructure using code, enabling automated and repeatable deployments with program templates.
+
+An AWS CloudFormation template is a declaration of the AWS resources that make up a stack. The template is stored as a text file in either JavaScript Object Notation (JSON) or YAML format. They are simple text files that can be created with any text editor, and managed as part of a source control system with other source code repositories.
+
+A stack is composed of a set of values that define how AWS services are launched. The only component required within a stack are Resources which lists the services you want to deploy.
+
+Writing your first CloudFormation Template
+Let's build our first CloudFormation template to create a single S3 bucket for storing data objects. In the following steps, do not change any of the default values or settings unless instructed to do so.
+
+From the VSCode editor, create a new file called s3-cloudformation.yaml. Cut and paste the following two lines into the file:
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+
+Line 1 defines the version that should be used by CloudFormation to interpret the template. It is an optional component and the only acceptable value is 2010-09-09 (the latest template format version). This line should always be the first line in the configuration file.
+
+The second line defines the top level Resources identifier. As mentioned previously, it is the only mandatory component as it contains all of the AWS service resources for that CloudFormation will create.
+
+Now that we have some basic elements defined, let's add a few additional lines. Copy and paste the following lines into the file after the first two lines:
+
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: "our-first-s3-bucket-workshop"
+
+The first line specifies a tag you define for the S3 bucket resource within the CloudFormation template. It is a logical identifier you can refer to througout the template. In this example, we will use the value S3Bucket.
+
+Line 2 specifies the type of AWS resource to create. We are creating an S3 bucket, a resource widely used in AWS for storing and managing objects like images, backup files, and other types of data. Detailed descriptions for all of the AWS resources supported by CloudFormation can be found in the CloudFormation  documentation.
+
+The third line allows you to specify additional settings or Properties for the S3 resource. The is a commonly used parameter for most resources.
+
+Line 4 declares the first property that we have defined for the S3 bucket. The property names the S3 bucket our-first-s3-bucket-workshop.
+
+IMPORTANT
+The bucket name used in the example is for illustrative purposes only. S3 Bucket names must be globally unique, and for the duration of this workshop you will need to assign names that satisfy this requirement. We suggest adding the last 4-digits of the AWS account number to the end of a bucket as this will increase the likelihood that the name will be unique. Consider other tips like your school's name, or your location as part of a bucket name also.
+
+In your s3-cloudformation.yaml file, replace the bucket name example on line 4 above with a globally unique bucket name value. NOTE: Be sure to insert the name in between the quotes (" ").
+
+The template now has the minimum required decalarations to deploy a bucket resource. Let's proceed by saving the file, and using the CloudFormation service to deploy the resource in the AWS account.
+
+As part of the AWS account environment, you should already have an existing S3 bucket. Run the following command in the VSCode terminal to list the S3 bucket:
+
+aws s3 ls
+
+The output sequence will look something like this:
+
+ubuntu@dev:/workshop$ aws s3 ls
+2024-07-27 13:58:11 vscode-server-ssmlogbucket-XXXXXXXXXX
+Where vscode-server-ssmlogbucket-XXXXXXXXXX is the name of the bucket. Copy the s3-cloudformation.yaml into the bucket. This will allow us to reference the file later as input to the CloudFormation operation:
+
+aws s3 cp /workshop/s3-cloudformation.yaml s3://vscode-server-ssmlogbucket-XXXXXXXXXX
+
+Be sure to replace the sample name of the S3 bucket above with the actual bucket name from your terminal output. You will see a return statement if the upload of the object is successful:
+
+upload: ./s3-cloudformation.yaml to s3://vscode-server-ssmlogbucket-XXXXXXXXXX/s3-cloudformation.yaml
+You can confirm the upload by running the next command to list the objects inside the S3 bucket:
+
+aws s3 ls vscode-server-ssmlogbucket-XXXXXXXXXX/
+
+Again, be sure to use the actual name of the S3 bucket in your environment for the above commands.
+
+Deploy your first CloudFormation Template
+To deploy our CloudFormation stack, we have two options:
+
+a) We can proceed by uploading the YAML file manually using the AWS management console.
+b) We can use the AWS CLI to execute commands to deploy the stack programatically.
+
+Let's review both options before deciding. NOTE: Choose one of the two options, and make sure you only execute the deployment steps once to avoid any potential errors.
+
+AWS Console
+AWS CLI
+You have successfully deployed a CloudFormation stack and created an S3 bucket!!!
+
+Using Your Own AWS Account
+As a best practice, it is always recommended to delete the stack when the resources created are no longer being used to avoid unnecessary charges.
+
+More code settings for the CloudFormation template
+Your team wants an S3 bucket to store company data. They request that you to implement a security mechanism to ensure the data is encrypted and protected from accidental deletions.
+
+You need to create a new template with updates to satisfy the required configurations.
+
+Create a duplicate copy of the CloudFormation template, giving the new file a separate name (e.g., s3-cloudformation-2.yaml).
+
+Edit the Properties section with the following statement (NOTE: Define a new unique value for the name of the S3 bucket you will create):
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: "our-second-s3-bucket-workshop"
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+
+Line 7 above defines the BucketEncryption property that specifies the encryption settings for the S3 bucket. Adding this will allow a bucket to set additional protections on the stored data.
+
+Lines 8 thorugh 10 defines the ServerSideEncryptionConfiguration property which sets a server-side encryption configuration. We want to use the AES-256 algorithm to encrypt our data. AES-256 is a symmetric encryption algorithm that provides strong encryption and is a widely used security standard for encrypting data.
+NOTE: Server-side encryption is automatically applied to new objects stored in the bucket by default, however you can include this statement as a security best practice to implement additional encryption settings. For example, S3 buckets can be encrypted using encryption keys.
+
+Now that we have added a change for data protection, let's enable object versioning. Versioning in Amazon S3 allows for multiple variants of an object in the same bucket. It is a common data protection practice, and you can use the feature to preserve, retrieve, or restore any version of all objects stored in an S3 bucket.
+
+Add two additional lines to the end of the Resources statement in the new file,
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: "our-second-s3-bucket-workshop"
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+            VersioningConfiguration:        <--- add this line to the file
+                Status: Enabled             <--- add this line to the file
+
+Line 11 declares a property to enable object versioning. Make sure to set the Status to Enabled as shown in Line 12.
+Save the file. Reminder, that if you are using the management console to execute the stack, be sure to copy the newly created file to the S3 bucket used in the previous workflow.
+
+Deploy an updated version of the CloudFormation template
+Let's deploy the new version of the template using the same steps previously executed. NOTE: Choose either step, but make sure you only complete the chosen step once. Be sure to provide a new stack name (e.g., S3Stack-2), and point the configuration to the new template files.
+
+AWS Console
+AWS CLI
+Conclusion of workflow
+You have completed the first workflow!
+
+What did you accomplish in this workflow?
+AWS CloudFormation is a managed cloud service that allows developers and users to create templates for deploying AWS resources.
+You followed the steps to deploy a CloudFormation Stack using the AWS management console or the AWS CLI.
+Two stacks were deployed using several values to configure S3 buckets.
+The second S3 bucket was created using security best practices and versioning using CloudFormation.
+    
+CloudFormation Parameters
+
+CloudFormation Parameters
+Welcome to the next workflow in the IaC workshop using CloudFormation. In this session, we will introduce CloudFormation parameters for creating flexible and reusable templates. Parameters allow you to customize your CloudFormation stacks at deployment time without modifying the template itself.
+
+By the end of this session, you will understand how to use parameters effectively for better control of the properties defined for AWS resources.
+
+Introduction to Parameters
+Parameters in CloudFormation templates provide a way to pass values to the template at runtime. This enables you to create more flexible and reusable templates that can be adapted to different environments and scenarios without the need for additional edits to the template. The main benefits of using parameters are:
+
+Customization: Parameters allow you to customize resource properties, such as EC2 instance types, S3 bucket names, or VPC IDs, based on your needs.
+
+Reusability: With parameters, you can reuse the same template across different environments (e.g., development, testing, production) by specifying different parameter values.
+
+Your company is satisfied with the bucket created earlier and is actively using it in a production environment. They are now requesting that you create another bucket resource in an environment used to build applications. With the additional bucket, the company will improve its development processes without impact to critical data used for production operations.
+
+With the help of parameters, resource updates can be made without changing the template every time an environment requires a change.
+
+Basic Parameter Definition
+Here's an example of a simple parameter definition:
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The environment for this stack (e.g., dev, test, prod)
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    ConstraintDescription: must be one of the allowed values (dev, test, prod)
+Explanation of Attributes
+
+Type: Specifies the data type of the parameter. Common types of parameters include:
+
+String
+Number
+List
+CommaDelimitedList
+AWS::EC2::KeyPair::KeyName
+AWS::EC2::VPC::Id
+Description: Brief description of the parameter, which is useful for documentation and clarity.
+
+Default: Specifies the default value for the parameter if no value is provided at runtime.
+
+AllowedValues: Restricts the values that can be provided for the parameter to a predefined list.
+
+ConstraintDescription: Describes the constraint when the parameter value does not match the allowed values or types.
+
+Add some parameters in a CloudFormation template
+Copy the s3-cloudformation.yaml file into a new file (e.g., s3-cloudformation-3.yaml) and insert this code before the Resources top level key (NOTE: the line starting with AWSTemplateFormatVersion: should remain as the top line in the file):
+
+Parameters:
+   BucketName:
+      Type: String
+      Description: Name of the S3 bucket
+      Default: our-first-s3-bucket-workshop
+      AllowedPattern: '^[a-zA-Z0-9.\-_]{1,255}$'
+      ConstraintDescription: must be a valid S3 bucket name.
+
+We just defined our first template variable! It is a simple string variable to save the bucket name. We will see later how this is used in the Resources section.
+
+On line 6, we added some constraints to make sure the bucket name contains only valid characters. These constraints will help to ensure that the execution of the template does not result in an error. Another good use for constraint patterns would be to ensure that values like an IP address are entered correctly.
+
+Reminder that the default bucket name must be globally unique and satisfy several rules:
+
+Bucket names must contain a minimum of 3 and a maximum of 63 characters.
+Bucket names can consist only of lowercase letters, numbers, dots (.), and hyphens (-).
+Bucket names must begin and end with an alphanumeric character (i.e., letter or number).
+Let's add an Environment parameter to the CloudFormation script after the BucketName declarations. The entire section should look similar to the following:
+
+Parameters:
+   BucketName:
+      Type: String
+      Description: The name of the S3 bucket
+      Default: our-first-s3-bucket-workshop
+      AllowedPattern: '^[a-zA-Z0-9.\-_]{1,255}$'
+      ConstraintDescription: must be a valid S3 bucket name.
+   Environment:
+      Type: String
+      Description: The environment where we want to deploy the stack
+      AllowedValues:
+       - development
+       - production
+
+With this parameter, we are allowed to have only two possible values: one for production and one for development.
+
+Intrinsic Functions
+Intrinsic functions in AWS CloudFormation are built-in functions that help you manage and customize your stacks. They enable you to perform various tasks such as referencing parameters, resource properties, or conditionally including/excluding resources. The !Ref function is one of the most commonly used intrinsic functions. It allows you to reference the value of a parameter or the physical ID of a resource.
+
+For example, using !Ref with a parameter returns the value provided for that parameter at runtime, making templates more dynamic and reusable.
+
+Using the information above, we can now establish a new format for the Resources. The below example is for illustrative purposes and should not be copied into the new template file:
+
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: !Ref BucketName
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+            VersioningConfiguration:
+                Status: Enabled
+As you can see on line 5 we referenced the parameter to change the bucket name dynamically. Let's include the environment as well to make sure the bucket name is unique. Copy this snippet of code into the file replacing the current Resources: section:
+
+Resources:
+    S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Properties:
+            BucketName: !Sub "${BucketName}-${Environment}"
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                - ServerSideEncryptionByDefault:
+                    SSEAlgorithm: AES256
+            VersioningConfiguration:
+                Status: Enabled
+
+Here it gets more interesting. Line 5 now uses the !Sub intrinsic function to substitute variables within a string. Here’s what each part means:
+
+!Sub: This intrinsic function allows for string substitution. It replaces variables in the format ${VariableName} with their corresponding values.
+${BucketName}: This is a reference to the parameter BucketName. It will be replaced by the actual value provided for BucketName.
+${Environment}: This is a reference to the parameter Environment. It will be replaced by the actual value provided for Environment.
+Putting it all together, !Sub "${BucketName}-${Environment}" dynamically constructs a bucket name by combining the values of BucketName and Environment with a hyphen in between.
+
+Deploy the changes in the CloudFormation template
+Follow the steps described in the previous workstream to deploy the new updates in the above the template. For this execution, CloudFormation will prompt you to add values for the two parameters we created. Proceed by executing the same stack instructions performed previously. Be sure to provide new names for the S3 bucket and CloudFormation stack to avoid any errors.
+
+NOTE: If you are using the management console, add the parameters in proper fields in the Specify stack section. If using the AWS CLI, create a new json file called parameters.json, and populate the file with the following code, remembering to use a globally unique name for your S3 bucket's ParameterValue variable:
+
+[
+    {
+        "ParameterKey": "BucketName",
+        "ParameterValue": "<our-third-s3-bucket-workshop>"
+    },
+    {
+        "ParameterKey": "Environment",
+        "ParameterValue": "development"
+    }
+]
+
+Save the above JSON content into a file named parameters.json in the same directory as your template file.
+
+Finally, use the following AWS CLI command to create a stack named S3Stack-3 using the template file (s3-cloudformation-3.yaml) and the parameters file (parameters.json):
+
+aws cloudformation create-stack --stack-name S3Stack-3 --template-body file://s3-cloudformation-3.yaml --parameters file://parameters.json
+
+The only difference with the previous command is the argument --parameters file://parameters.json that points to the location of the JSON file containing the parameter values.
+
+Conclusion of workflow
+You have successfully completed another workstream using CloudFormation!
+
+What did you accomplish in this workflow?
+This workflow focused on how to use parameters in CloudFormation templates. Parameters can help with the reuse of code to manage multiple environments.
+
+Additionally, we introduced two common intrinsic functions called !Ref and !Sub. For more information on intrinsic functions used in CloudFormation, reference the AWS CloudFormation User Guide .
+
+     
+CloudFormation Conditions
+
+CloudFormation Conditions
+Welcome to the third workstream in the CloudFormation workshop. In this module, we will demonstrate how to use conditions to create resources based on parameters and their values. This technique helps developers create more flexible cloud infrastructure.
+
+CloudFormation Conditions
+A Condition in CloudFormation allows you to manage resources when certain requirements are met. This can be based on parameter values or existing resources. For example, we can set a condition to create the name of a resource based on the environment it is being used for. Let's look closely at an example.
+
+Let's create a new file (e.g., s3-cloudformation-condition.yaml) and insert the following code:
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Basic CloudFormation template to demonstrate conditions.
+
+Parameters:
+  EnvironmentType:
+    Description: The environment where the stack is deployed (prod or preprod)
+    Type: String
+    AllowedValues:
+      - prod
+      - preprod
+    Default: preprod
+
+Conditions:
+  IsProduction:
+    Fn::Equals:
+      - !Ref EnvironmentType
+      - prod
+  IsPreProd:
+    Fn::Equals:
+      - !Ref EnvironmentType
+      - preprod
+
+
+In this top section of the template, we are defining the following,
+
+The Parameters section starting on Line 4 that contains a single EnvironmentType variable. This will define either prod value for a production build, or preprod for a pre-production environment. We will set the default value to preprod.
+In Conditions starting on Line 13, we will evaluate the EnvrionmentType parameter and set IsProduction = prod for a value of prod. If the parameter evaluates to preprod, then we will set IsPreProd = preprod.
+Add some additional code by cutting and pasting the Resources: section to the end of the file below the Conditions:
+
+Resources:
+  ProdBucket:
+    Type: AWS::S3::Bucket
+    Condition: IsProduction
+    Properties:
+      BucketName: !Sub "${AWS::Region}-${AWS::AccountId}-bucket-prod"
+      VersioningConfiguration: 
+        Status: Enabled
+
+  PreProdBucket:
+    Type: AWS::S3::Bucket
+    Condition: IsPreProd
+    Properties:
+      BucketName: !Sub "${AWS::Region}-${AWS::AccountId}-bucket-preprod"
+      VersioningConfiguration:
+        Status: Suspended
+
+
+Here, we add more conditions to create a production bucket, if !IsProduction evaluates to true, or create a preproduction resource if IsPreProd evaluates to true. Save the file, and before executing the stack, answer the following question,
+
+Q: Based on the declarations of the template, which environment will the S3 bucket be created for?
+
+Answer
+Execute the stack, using from the VSCode terminal:
+
+aws cloudformation create-stack --stack-name S3Stack-condition --template-body file://s3-cloudformation-condition.yaml
+
+Challenge: Use the above instructions to create a bucket for the production environment using the same CloudFormation without making any edits to the file! Remember to use a new stack name, and recall how we used the parameters.json file in the previous workflow.
+
+Challenge Solution
+Conclusion of workflow
+What did you do in this workflow?
+In this workflow, you learned how to use conditions in your CloudFormation template to efficiently re-use code and to support multiple environments. Conditions make it easier to develop environment-specific configurations, and better manage resources and outputs.
+
+   
+Introduction to AWS Cloud Development Kit with Python
+
+Introduction to AWS Cloud Development Kit with Python
+You are confident your company can now use AWS CloudFormation and Infrastructure-as-Code techniques to improve their developmenmt processes and environments. The next task is to explain the topic of automating infrastructure using code to a Senior Engineer in the organization. She is an experienced Python developer, but has never been a fan of other languges like YAML. She is also unfamiliar with the latest capabilities available on cloud platforms.
+
+After some additional research you discovered the AWS Cloud Development Kit which supports the Python programming language. This presents a great opportunity to demonstrate those capabilities during the discussion.
+
+NOTE: This workflow will require the installation of additional software in your VSCode environment.
+
+Introduction to CDK
+The AWS Cloud Development Kit (CDK) is a software development framework for deploying cloud infrastructure using a variety of programming languages. CDK's flexibility allows you to leverage the full power of programming constructs and libraries that you understand and are familiar with to define and manage your infrastructure. In this workstream, we will use Python with the AWS CDK to define and deploy an AWS resource.
+
+Prerequisites
+AWS account with the proper access permissions for resource deployment
+AWS Cloud Development Kit
+AWS command line interface (CLI)
+Node.js with the npm utilities installed
+Python (version 3.9 or higher is recommended)
+Installing the CDK
+From the command line inside the VSCode session, install the AWS CDK using npm:
+
+sudo npm install -g aws-cdk
+
+Verify the installation of the AWS CDK:
+
+
+cdk --version
+
+You should be running cdk version 2.150.0 or higher
+
+Create a new CDK Project
+From the /Workshop directory, create a new sub-directory as the parent folder for your project and navigate into it:
+
+
+mkdir my-first-cdk-project
+cd my-first-cdk-project
+
+Initialize a new CDK project. For the project, specify that you will use Python as the preferred language for building the code infrastructure:
+
+cdk init app --language python
+
+Once executed, the command will create several files and a directory structure for the project. The resources of note are:
+
+app.py: Entry point of your CDK application.
+requirements.txt: File containing a list of dependencies for your project.
+cdk.json: Configuration file for the CDK project.
+CDK init app python
+
+We will now create and activate a virtual environment containing the necessary modules for the Python language. Virtual environments create a level of isolation that provides more control and freedom from libraries and modules on the host system which may interfere with development:
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+Once the environment is sourced, the terminal will contain the phrase (.venv) at the beginning of the command prompt.
+
+Proceed with the next step by installing the necessary library dependencies for the project. We noted earlier that the requirements.txt file contains a list of libraries, so we will add it as an argument:
+
+1
+pip install -r requirements.txt
+
+Create a S3 bucket using CDK
+We are now ready to create another S3 bucket resource. The difference in this workflow is instead of using a CloudFormation template, we will use the CDK.
+
+From the project's parent folder, move to the my_first_cdk_project sub-folder. By default, the CDK creates the folder name by converting the parent folder name using snake case with the "_" character:
+
+1
+cd my_first_cdk_project
+
+Edit the my_first_cdk_project_stack.py file by replacing the existing code with the following:
+
+from aws_cdk import (
+    Stack,
+    aws_s3 as s3
+)
+from constructs import Construct
+
+class MyFirstCdkProjectStack(Stack):
+
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+
+        s3.Bucket(
+            self, 
+            id="bucket123", 
+            bucket_name="<our-first-cdk-s3-bucket>" # Use a globally unique bucket name
+        )
+
+Let's briefly analyze this code.
+
+Import Statement
+
+from aws_cdk import (
+    Stack,
+    aws_s3 as s3
+)
+Stack: This imports the core module from the AWS CDK library, which contains essential classes and methods for defining CDK applications and stacks.
+aws_s3 as s3: This imports the AWS S3 module from the AWS CDK library and assigns it the alias s3. This module contains classes and methods for working with S3 resources.
+Stack Definition
+1
+class MyFirstCdkProjectStack(Stack):
+class MyFirstCdkProjectStack(Stack): This defines a new class MyFirstCdkProjectStack that inherits from Stack.
+In AWS CDK, a stack is a unit of deployment that contains AWS resources. By inheriting from Stack, this class becomes a CDK stack.
+
+Constructor Method
+
+def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+This is the constructor method for the MyfirstCdkProjectStack class. It initializes the stack taking as parameters the scope (the construct tree node that is the parent of this stack) and the id (unique identifier for the stack).
+
+Define an S3 Bucket
+
+s3.Bucket(
+            self, 
+            id="bucket123", 
+            versioned=True,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            bucket_name="<our-first-cdk-s3-bucket>" # Use a globally unique bucket name
+        )
+This part of the code is most similar to the CloudFormation template the we defined previously. We are creating an S3 Bucket with object versioning and server-side encryption enabled.
+
+Review the file for accuracy and completeness and then save the file. Once saved, move back to the parent directory:
+
+cd ../
+
+Run the next command to display the list of stacks configured in your environment. It should only return the single project we have created. Returning the project list will also confirm that there are no syntactical errors within the code.
+
+cdk ls
+
+We are now ready to deploy!
+
+Deploy the CDK Stack
+CDK uses CloudFormation under the hood to manage the deployment of resources. CDK takes care of creating a YAML template from the Python configuration. This proces is called Synth.
+
+If your app contains more than one stack, you must specify which stacks to synthesize. Since our app contains a single stack, the CDK CLI automatically detects the stack to synthesize. If you don't run cdk synth, the CDK CLI will automatically perform this step when you deploy. However, we recommend that you run this step before each deployment.
+
+cdk synth
+
+The cdk synth command runs your app. This creates an AWS CloudFormation template for each stack in your app. The CDK CLI will display a YAML formatted version of your template at the command line and save a JSON formatted version of your template in the cdk.out directory.
+
+You must perform a one-time bootstrapping of your AWS environment before deployment. Run the command:
+
+cdk bootstrap
+
+Then, proceed to deploy the stack:
+
+cdk deploy
+
+You should see output indicating that the stack is being deployed. Once complete, the new S3 bucket will be created in your AWS account.
+
+Conclusion of workflow
+What did you do in this workflow?
+While this workflow was short, it is important to know the basics of CDK to manage our infrastructures.
+You praticed commands like cdk synth, cdk bootstrap and cdk deploy.
+
+Summary
+Congratulations on completing all of the workflows for AWS CloudFormation and AWS Cloud Development Kit.
+We hope you've enjoyed learning about these tools, and feel better prepared to start leveraging them to build your applications.
+
+Cleanup
+Time to tidy up our toys now that we are finished playing with them:
+
+If you are participating in a hosted event, there is no clean up required, we do that for you.
+If you are supplying your own AWS account and provisioned the EC2 instance to run the VSCode server, you will need to:
+
+Delete any objects that you added in the S3 bucket and
+Delete all CloudFormation stacks.
+These actions can be performed in the S3 Dashboard in the specific S3 Bucket and in the CloudFormation Dashboard. Any resources that remain (even if unused) may incur a cost, so be sure you perform an account review and delete what you no longer need.
+
+Ensure there is nothing in the instance that you wish to retain before deleting it!
